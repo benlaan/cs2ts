@@ -74,6 +74,9 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="ConvertNamespaceTest.cs" />
     <Compile Include="ConvertNestedClassTest.cs" />
+    <Compile Include="ConvertMethodTest.cs" />
+    <Compile Include="ConvertDeclarationStatementTest.cs" />
+    <Compile Include="ConvertTryBlockTest.cs" />
     <Compile Include="ConvertSimpleClassTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -16,29 +16,45 @@ namespace cs2ts
 
         public Visitor() : base(SyntaxWalkerDepth.Node)
         {
-            this._output = new List<string>();
-            this._indent = 0;
+            _output = new List<string>();
+            _indent = 0;
         }
 
         private void AddClassScope(ClassDeclarationSyntax node)
         {
-            string modifier = Visitor.GetVisibilityModifier(node.Modifiers);
+            string modifier = GetVisibilityModifier(node.Modifiers);
 
-            this.Emit(string.Join(" ", new[] { modifier, "class", node.Identifier.Text }));
+            Emit(string.Join(" ", modifier, "class", node.Identifier.Text));
 
-            using (IndentScope())
+            using (IndentedBracketScope())
             {
                 base.VisitClassDeclaration(node);
             }
         }
 
+        private string GetIndentation()
+        {
+            return new string(' ', _indent * 4);
+        }
+
         private void Emit(string text, params object[] args)
         {
-            this._output.Add(string.Format(string.Concat(new string(' ', this._indent * 4), text), args));
+            var indentation = GetIndentation();
+
+            if (!args.Any())
+                _output.Add(string.Concat(indentation, text));
+            else
+                _output.Add(string.Format(string.Concat(indentation, text), args));
         }
 
         private string GetMappedType(TypeSyntax type)
         {
+            if (type.ToString() == "void")
+                return "void";
+
+            if (type.ToString().EndsWith("Exception"))
+                return type.ToString();
+
             return type.ToString().StartsWith("int") ? "number" : "string";
         }
 
@@ -47,7 +63,7 @@ namespace cs2ts
             return tokens.OfType<SyntaxToken>().Any(m => m.Kind() == SyntaxKind.PublicKeyword) ? "public" : "private";
         }
 
-        private Visitor.EndBlock IndentScope()
+        private Visitor.EndBlock IndentedBracketScope()
         {
             return new EndBlock(this);
         }
@@ -61,9 +77,8 @@ namespace cs2ts
         {
             foreach (var statement in node.Statements)
             {
-                this.Emit(statement.ToString());
+                base.Visit(statement);
             }
-            base.VisitBlock(node);
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -77,7 +92,7 @@ namespace cs2ts
 
             foreach (var identifier in node.Declaration.Variables)
             {
-                Emit(string.Format("{0} {1}: {2};", visibility, identifier.GetText(), this.GetMappedType(node.Declaration.Type)), new object[0]);
+                Emit(string.Format("{0} {1}: {2};", visibility, identifier.GetText(), this.GetMappedType(node.Declaration.Type)));
             }
         }
 
@@ -85,18 +100,27 @@ namespace cs2ts
         {
             string visibility = GetVisibilityModifier(node.Modifiers);
 
-            Emit(String.Join(" ", visibility, String.Concat(node.Identifier.Text, ":"), this.GetMappedType(node.ReturnType)));
+            var parameters = string.Format(
+                "({0})",
+                node.ParameterList
+                    .Parameters
+                    .Select(p => string.Format("{0}: {1}", p.Identifier.Text, GetMappedType(p.Type)))
+                    .ToCsv()
+            );
 
-            using (IndentScope())
+            var methodSignature = string.Format("{0}{1}:", node.Identifier.Text, parameters);
+            Emit(String.Join(" ", visibility, methodSignature, this.GetMappedType(node.ReturnType)));
+
+            using (IndentedBracketScope())
             {
-                base.VisitMethodDeclaration(node);
+                VisitBlock(node.Body);
             }
         }
 
         public override void VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
-            this.Emit("module {0}", new object[] { node.Name.ToString() });
-            using (Visitor.EndBlock endBlock = this.IndentScope())
+            Emit("module {0}", node.Name.ToString());
+            using (IndentedBracketScope())
             {
                 base.VisitNamespaceDeclaration(node);
             }
@@ -115,15 +139,77 @@ namespace cs2ts
 
                     Emit(string.Format("{0} {1} {2}{3}", visibility, accessor.Keyword, node.Identifier.Text, signature));
 
-                    using (IndentScope())
+                    using (IndentedBracketScope())
                     {
-                        base.Visit(accessor.Body);
+                        VisitBlock(accessor.Body);
                     }
                 }
             }
             else
             {
                 Emit(string.Join(" ", visibility, string.Concat(node.Identifier.Text, ":"), mappedType));
+            }
+        }
+
+        public override void VisitTryStatement(TryStatementSyntax node)
+        {
+            Emit("try");
+            using (IndentedBracketScope())
+            {
+                VisitBlock(node.Block);
+            }
+            foreach (var @catch in node.Catches)
+            {
+                string arguments = String.Empty;
+                if (!(@catch.Declaration == null))
+                {
+                    if (@catch.Declaration.Identifier != null)
+                        arguments = string.Format(" ({0})", @catch.Declaration.Identifier.Text);
+                }
+
+                Emit("catch" + arguments);
+                using (IndentedBracketScope())
+                {
+                    VisitBlock(@catch.Block);
+                }
+            }
+        }
+
+        public override void VisitExpressionStatement(ExpressionStatementSyntax node)
+        {
+            // TODO: Don't just emit the expression as-is. Need to process the nodes of the expression
+            Emit(node.ToString());
+        }
+
+        public override void VisitReturnStatement(ReturnStatementSyntax node)
+        {
+            Emit(node.ToString());
+        }
+
+        public override void VisitVariableDeclaration(VariableDeclarationSyntax node)
+        {
+            var type = node.Type.ToString() != "var" ? GetMappedType(node.Type) : String.Empty;
+
+            if (node.Variables.SeparatorCount == 0)
+            {
+                foreach (var identifier in node.Variables)
+                {
+                    var initializer = identifier.Initializer != null ? (" " + identifier.Initializer) : String.Empty;
+                    var typeDeclaration = !string.IsNullOrEmpty(type) ? ": " + type : String.Empty;
+                    Emit(string.Format("var {0}{1}{2};", identifier.Identifier.Value, typeDeclaration, initializer));
+                }
+            }
+            else
+            {
+                var prefix = "var ";
+                var identifier = node.Variables.Last();
+                var initializer = identifier.Initializer != null ? (" " + identifier.Initializer) : String.Empty;
+                var typeDeclaration = !string.IsNullOrEmpty(type) ? ": " + type : String.Empty;
+
+                string padding = new string(' ', prefix.Length);
+                var separator = String.Concat(",", Environment.NewLine, GetIndentation(), padding);
+                var lines = prefix + String.Join(separator, node.Variables.Select(v => v.Identifier.Value).ToList());
+                Emit(string.Format("{0}{1}{2};", lines, typeDeclaration, initializer));
             }
         }
 
@@ -134,14 +220,14 @@ namespace cs2ts
             internal EndBlock(Visitor visitor)
             {
                 _visitor = visitor;
-                _visitor.Emit("{{");
+                _visitor.Emit("{");
                 _visitor._indent = _visitor._indent + 1;
             }
 
             public void Dispose()
             {
                 _visitor._indent = _visitor._indent - 1;
-                _visitor.Emit("}}");
+                _visitor.Emit("}");
             }
         }
     }

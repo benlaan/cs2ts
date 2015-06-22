@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Text;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -63,7 +64,17 @@ namespace cs2ts
         {
             var actual = Parse(code).Output();
             var actualAsList = actual.Replace("\r", "").Split(new string[] { "\n" }, StringSplitOptions.None);
-            CollectionAssert.AreEqual(expected, actualAsList, DisplayLists(expected, actualAsList));
+
+            var dump = DisplayLists(expected, actualAsList);
+            try
+            {
+                CollectionAssert.AreEqual(expected, actualAsList, dump);
+            }
+            catch (AssertionException)
+            {
+                Debug.WriteLine(dump);
+                throw;
+            }
         }
     }
 }
