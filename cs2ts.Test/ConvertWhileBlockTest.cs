@@ -1,31 +1,25 @@
 ﻿using System;
-using System.Text;
 using System.Linq;
-
-using Microsoft.CodeAnalysis.CSharp;
 
 using NUnit.Framework;
 
 namespace cs2ts.Tests
 {
     [TestFixture]
-    public class ConvertDeclarationStatementTest : BaseTest
+    public class ConvertWhileBlockTest : BaseTest
     {
         [Test]
-        [TestCase("var foo = 1",            "var foo = 1")]
-        [TestCase("int foo",                "var foo: number")]
-        [TestCase("int foo = 10",           "var foo: number = 10")]
-        [TestCase("string foo = 'Hello'",   "var foo: string = 'Hello'")]
-        [TestCase("string foo = \"Hello\"", "var foo: string = \"Hello\"")]
-        public void Can_Convert_Single_Declaration(string declaration, string output)
+        public void Can_Convert_Empty_While_Block()
         {
             var input = @"
 
                 public class AClass
                 {
                     public void AMethod()
-                    {@
-                        " + declaration + @";
+                    {
+                        while(true)
+                        {
+                        }
                     }
                 }
             @";
@@ -36,7 +30,9 @@ namespace cs2ts.Tests
                 "{",
                 "    public AMethod(): void",
                 "    {",
-                "        " + output + ";",
+                "        while(true)",
+                "        {",
+                "        }",
                 "    }",
                 "}",
             };
@@ -45,7 +41,7 @@ namespace cs2ts.Tests
         }
 
         [Test]
-        public void Can_Convert_One_Line_Multiple_Auto_Variable_Declaration()
+        public void Can_Convert_While_Block_With_Body()
         {
             var input = @"
 
@@ -53,7 +49,10 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        var x, y, z = 0;
+                        while(true)
+                        {
+                            Console.WriteLine(""!"");
+                        }
                     }
                 }
             @";
@@ -64,9 +63,10 @@ namespace cs2ts.Tests
                 "{",
                 "    public AMethod(): void",
                 "    {",
-                "        var x,",
-                "            y,",
-                "            z = 0;",
+                "        while(true)",
+                "        {",
+                "            Console.WriteLine(\"!\");",
+                "        }",
                 "    }",
                 "}",
             };
@@ -75,7 +75,7 @@ namespace cs2ts.Tests
         }
 
         [Test]
-        public void Can_Convert_Multi_Line_Multiple_Explicit_Variable_Declaration()
+        public void Can_Convert_While_Block_With_Unbraced_Body()
         {
             var input = @"
 
@@ -83,9 +83,8 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        int index, 
-                            zanzibar, 
-                            k = 0;
+                        while(true)
+                            Console.WriteLine(""!"");
                     }
                 }
             @";
@@ -96,9 +95,9 @@ namespace cs2ts.Tests
                 "{",
                 "    public AMethod(): void",
                 "    {",
-                "        var index,",
-                "            zanzibar,",
-                "            k: number = 0;",
+                "        while(true)",
+                "            Console.WriteLine(\"!\");",
+                "        }",
                 "    }",
                 "}",
             };

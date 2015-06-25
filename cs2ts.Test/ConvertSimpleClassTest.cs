@@ -147,7 +147,7 @@ namespace cs2ts.Tests
                 "{",
                 "    public class AClass",
                 "    {",
-                "        public AProperty: number",
+                "        public AProperty: number;",
                 "    }",
                 "}"
             };
