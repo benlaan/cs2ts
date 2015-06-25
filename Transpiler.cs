@@ -8,28 +8,21 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace cs2ts
 {
-    public class Visitor : CSharpSyntaxWalker
+    public class Transpiler : CSharpSyntaxWalker
     {
         private readonly IList<string> _output;
 
         private int _indent;
 
-        public Visitor() : base(SyntaxWalkerDepth.Node)
+        public Transpiler(string code) : base(SyntaxWalkerDepth.Node)
         {
             _output = new List<string>();
             _indent = 0;
-        }
 
-        private void AddClassScope(ClassDeclarationSyntax node)
-        {
-            string modifier = GetVisibilityModifier(node.Modifiers);
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var root = tree.GetRoot();
 
-            Emit(string.Join(" ", modifier, "class", node.Identifier.Text));
-
-            using (IndentedBracketScope())
-            {
-                base.VisitClassDeclaration(node);
-            }
+            Visit(root);
         }
 
         private string GetIndentation()
@@ -60,17 +53,27 @@ namespace cs2ts
 
         private static string GetVisibilityModifier(SyntaxTokenList tokens)
         {
-            return tokens.OfType<SyntaxToken>().Any(m => m.Kind() == SyntaxKind.PublicKeyword) ? "public" : "private";
+            return tokens.Any(m => m.Kind() == SyntaxKind.PublicKeyword) ? "public" : "private";
         }
 
-        private Visitor.EndBlock IndentedBracketScope()
+        private Transpiler.BlockScope IndentedBracketScope()
         {
-            return new EndBlock(this);
+            return new BlockScope(this);
+        }
+
+        public void AddIndent()
+        {
+            _indent += 1;
+        }
+
+        public void RemoveIndent()
+        {
+            _indent -= 1;
         }
 
         public string Output()
         {
-            return string.Join(Environment.NewLine, this._output);
+            return string.Join(Environment.NewLine, _output);
         }
 
         public override void VisitBlock(BlockSyntax node)
@@ -83,7 +86,14 @@ namespace cs2ts
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            AddClassScope(node);
+            string modifier = GetVisibilityModifier(node.Modifiers);
+
+            Emit(string.Join(" ", modifier, "class", node.Identifier.Text));
+
+            using (IndentedBracketScope())
+            {
+                base.VisitClassDeclaration(node);
+            }
         }
 
         public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
@@ -92,7 +102,7 @@ namespace cs2ts
 
             foreach (var identifier in node.Declaration.Variables)
             {
-                Emit(string.Format("{0} {1}: {2};", visibility, identifier.GetText(), this.GetMappedType(node.Declaration.Type)));
+                Emit(string.Format("{0} {1}: {2};", visibility, identifier.GetText(), GetMappedType(node.Declaration.Type)));
             }
         }
 
@@ -129,7 +139,7 @@ namespace cs2ts
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
             string mappedType = GetMappedType(node.Type);
-            string visibility = Visitor.GetVisibilityModifier(node.Modifiers);
+            string visibility = GetVisibilityModifier(node.Modifiers);
 
             if (!(node.AccessorList.Accessors.All(ad => ad.Body == null)))
             {
@@ -147,7 +157,7 @@ namespace cs2ts
             }
             else
             {
-                Emit(string.Join(" ", visibility, string.Concat(node.Identifier.Text, ":"), mappedType));
+                Emit(string.Join(" ", visibility, string.Concat(node.Identifier.Text, ":"), mappedType + ";"));
             }
         }
 
@@ -213,20 +223,20 @@ namespace cs2ts
             }
         }
 
-        internal class EndBlock : IDisposable
+        internal class BlockScope : IDisposable
         {
-            private readonly Visitor _visitor;
+            private readonly Transpiler _visitor;
 
-            internal EndBlock(Visitor visitor)
+            internal BlockScope(Transpiler visitor)
             {
                 _visitor = visitor;
                 _visitor.Emit("{");
-                _visitor._indent = _visitor._indent + 1;
+                _visitor.AddIndent();
             }
 
             public void Dispose()
             {
-                _visitor._indent = _visitor._indent - 1;
+                _visitor.RemoveIndent();
                 _visitor.Emit("}");
             }
         }

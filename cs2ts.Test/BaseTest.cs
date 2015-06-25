@@ -11,16 +11,6 @@ namespace cs2ts
 {
     public class BaseTest
     {
-        protected static Visitor Parse(string code)
-        {
-            var tree = CSharpSyntaxTree.ParseText(code);
-            var root = tree.GetRoot();
-
-            var visitor = new Visitor();
-            visitor.Visit(root);
-            return visitor;
-        }
-
         private static string DisplayText(string text)
         {
             var dot = '·';
@@ -62,7 +52,7 @@ namespace cs2ts
 
         protected static void Compare(string code, string[] expected)
         {
-            var actual = Parse(code).Output();
+            var actual = new Transpiler(code).Output();
             var actualAsList = actual.Replace("\r", "").Split(new string[] { "\n" }, StringSplitOptions.None);
 
             var dump = DisplayLists(expected, actualAsList);
