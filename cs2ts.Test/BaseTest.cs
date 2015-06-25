@@ -50,15 +50,38 @@ namespace cs2ts
             return index < lines.Length ? lines[index] : "";
         }
 
-        protected static void Compare(string code, string[] expected)
+        protected static void Compare(string code, string expected)
         {
-            var actual = new Transpiler(code).Output();
-            var actualAsList = actual.Replace("\r", "").Split(new string[] { "\n" }, StringSplitOptions.None);
+            var actual = new Transpiler(code).ToTypeScript();
 
-            var dump = DisplayLists(expected, actualAsList);
+            var actualAsList = actual.Replace("\r", "")
+                .Split(new[] { "\n" }, StringSplitOptions.None)
+                .Select(l => l.TrimEnd())
+                .ToArray();
+
+            var expectedAsList = expected
+                .Replace("\r", "")
+                .Split(new[] { "\n" }, StringSplitOptions.None)
+                .SkipWhile(l => l.Trim().Length == 0)
+                .ToArray();
+
+            expectedAsList = expectedAsList.Take(expectedAsList.Length - 1).ToArray();
+
+            var indentSize = expectedAsList
+                .First()
+                .TakeWhile(l => l == ' ')
+                .Count();
+
+            var indent = new string(' ', indentSize);
+
+            expectedAsList = expectedAsList
+                .Select(l => l.Replace(indent, "").TrimEnd())
+                .ToArray();
+
+            var dump = DisplayLists(expectedAsList, actualAsList);
             try
             {
-                CollectionAssert.AreEqual(expected, actualAsList, dump);
+                CollectionAssert.AreEqual(expectedAsList, actualAsList, dump);
             }
             catch (AssertionException)
             {

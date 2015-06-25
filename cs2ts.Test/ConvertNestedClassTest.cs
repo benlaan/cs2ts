@@ -2,7 +2,7 @@
 
 using NUnit.Framework;
 
-namespace cs2ts
+namespace cs2ts.Tests
 {
     [TestFixture]
     public class ConvertNestedClassTest : BaseTest
@@ -23,24 +23,24 @@ namespace cs2ts
                         public int ANestedNumber { get; set }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AOuterClass",
-                "{",
-                "    _field: number;",
-                "    ANumber: number;",
-                "}",
-                "module AOuterClass",
-                "{",
-                "    public class AInnerClass",
-                "    {",
-                "        _nestedField: number;",
-                "        ANestedNumber: number;",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                public class AOuterClass
+                {
+                    _field: number;
+                    ANumber: number;
+                }
+                module AOuterClass
+                {
+                    public class AInnerClass
+                    {
+                        _nestedField: number;
+                        ANestedNumber: number;
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }

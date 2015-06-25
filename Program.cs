@@ -17,7 +17,7 @@ namespace cs2ts
 
             var visitor = new Transpiler(File.ReadAllText(args[0]));
 
-            var output = visitor.Output();
+            var output = visitor.ToTypeScript();
             var outputFileName = args.Length > 1 ? args[1] : Path.ChangeExtension(args[0], "ts");
 
             File.WriteAllText(outputFileName, output);

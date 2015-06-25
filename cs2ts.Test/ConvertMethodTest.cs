@@ -22,17 +22,17 @@ namespace cs2ts.Tests
                     {
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -48,17 +48,17 @@ namespace cs2ts.Tests
                     {
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): string",
-                "    {",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): string
+                    {
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
@@ -74,17 +74,17 @@ namespace cs2ts.Tests
                     {
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(index: number, name: string): string",
-                "    {",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(index: number, name: string): string
+                    {
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }

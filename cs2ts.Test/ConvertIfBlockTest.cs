@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Text;
 using System.Linq;
-
-using Microsoft.CodeAnalysis.CSharp;
 
 using NUnit.Framework;
 
@@ -20,25 +17,25 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        if(true)
+                        if (true)
                         {
                         }
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        if(true)",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                        {
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -52,7 +49,7 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        if(true)
+                        if (true)
                         {
                         }
                         else
@@ -60,23 +57,23 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        if(true)",
-                "        {",
-                "        }",
-                "        else",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                        {
+                        }
+                        else
+                        {
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -101,26 +98,27 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        if(true)",
-                "        {",
-                "        }",
-                "        else if (false)",
-                "        {",
-                "        }",
-                "        else",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                        {
+                        }
+                        else 
+                            if (false)
+                            {
+                            }
+                            else
+                            {
+                            }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -134,43 +132,43 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        if(true)
+                        if (true)
                         {
                         }
                         else
                         {
-                            if(false)
+                            if (false)
                             {
                             }
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        if(true)",
-                "        {",
-                "        }",
-                "        else if (false)",
-                "        {",
-                "        }",
-                "        else",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                        {
+                        }
+                        else
+                        {
+                            if (false)
+                            {
+                            }
+                        }
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
 
         [Test]
-        public void Can_Convert_If_With_ElseIf_And_Final_Else()
+        public void Can_Convert_If_Without_Braces()
         {
             var input = @"
 
@@ -179,30 +177,56 @@ namespace cs2ts.Tests
                     public void AMethod()
                     {
                         if(true)
-                        {
-                        }
-                        else if(false)
-                        {
-                        }
+                            Console.WriteLine(""!"");
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        if(true)",
-                "        {",
-                "        }",
-                "        else if (false)",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                            Console.WriteLine(""!"");
+                    }
+                }
+            ";
+
+            Compare(input, expected);
+        }
+
+        [Test]
+        public void Can_Convert_If_Else_Without_Braces()
+        {
+            var input = @"
+
+                public class AClass
+                {
+                    public void AMethod()
+                    {
+                        if(true)
+                            Console.WriteLine(""!"");
+                        else
+                            Console.WriteLine(""!"");
+                    }
+                }
+             ";
+
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        if (true)
+                            Console.WriteLine(""!"");
+                        else
+                            Console.WriteLine(""!"");
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }

@@ -23,18 +23,18 @@ namespace cs2ts.Tests
                         private int _field;
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "        private _field: number;",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                        private _field: number;
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
@@ -53,20 +53,20 @@ namespace cs2ts.Tests
                         private int _field3;
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "        private _field1: number;",
-                "        private _field2: number;",
-                "        private _field3: number;",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                        private _field1: number;
+                        private _field2: number;
+                        private _field3: number;
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
@@ -83,20 +83,20 @@ namespace cs2ts.Tests
                         private int _field1, _field2, _field3;
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "        private _field1: number;",
-                "        private _field2: number;",
-                "        private _field3: number;",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                        private _field1: number;
+                        private _field2: number;
+                        private _field3: number;
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -112,17 +112,17 @@ namespace cs2ts.Tests
                     {
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -139,18 +139,18 @@ namespace cs2ts.Tests
                         public int AProperty { get; set; }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "        public AProperty: number;",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                        public AProperty: number;
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -172,26 +172,26 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "module ANamespace",
-                "{",
-                "    public class AClass",
-                "    {",
-                "        private _field: number;",
-                "        public get AProperty: number",
-                "        {",
-                "            return _field;",
-                "        }",
-                "        public set AProperty(value: number)",
-                "        {",
-                "            _field = value;",
-                "        }",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module ANamespace
+                {
+                    public class AClass
+                    {
+                        private _field: number;
+                        public get AProperty: number
+                        {
+                            return _field;
+                        }
+                        public set AProperty(value: number)
+                        {
+                            _field = value;
+                        }
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }

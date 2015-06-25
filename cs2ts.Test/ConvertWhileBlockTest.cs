@@ -17,25 +17,25 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        while(true)
+                        while (true)
                         {
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        while(true)",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        while (true)
+                        {
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -49,27 +49,27 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        while(true)
+                        while (true)
                         {
                             Console.WriteLine(""!"");
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        while(true)",
-                "        {",
-                "            Console.WriteLine(\"!\");",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        while (true)
+                        {
+                            Console.WriteLine(""!"");
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -83,24 +83,23 @@ namespace cs2ts.Tests
                 {
                     public void AMethod()
                     {
-                        while(true)
+                        while (true)
                             Console.WriteLine(""!"");
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        while(true)",
-                "            Console.WriteLine(\"!\");",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        while (true)
+                            Console.WriteLine(""!"");
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }

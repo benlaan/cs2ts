@@ -24,22 +24,22 @@ namespace cs2ts.Tests
                 public class AClass
                 {
                     public void AMethod()
-                    {@
+                    {
                         " + declaration + @";
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        " + output + ";",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        " + output + @";
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
@@ -56,20 +56,20 @@ namespace cs2ts.Tests
                         var x, y, z = 0;
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        var x,",
-                "            y,",
-                "            z = 0;",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        var x,
+                            y,
+                            z = 0;
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }
@@ -88,20 +88,20 @@ namespace cs2ts.Tests
                             k = 0;
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        var index,",
-                "            zanzibar,",
-                "            k: number = 0;",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        var index,
+                            zanzibar,
+                            k: number = 0;
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }

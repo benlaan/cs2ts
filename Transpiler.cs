@@ -61,6 +61,11 @@ namespace cs2ts
             return new BlockScope(this);
         }
 
+        private Transpiler.BlockScope IndentedBracketScope(SyntaxNode node)
+        {
+            return new BlockScope(this, node.Kind() == SyntaxKind.Block);
+        }
+
         public void AddIndent()
         {
             _indent += 1;
@@ -71,7 +76,7 @@ namespace cs2ts
             _indent -= 1;
         }
 
-        public string Output()
+        public string ToTypeScript()
         {
             return string.Join(Environment.NewLine, _output);
         }
@@ -223,21 +228,50 @@ namespace cs2ts
             }
         }
 
+        public override void VisitIfStatement(IfStatementSyntax node)
+        {
+            Emit("if ({0})", node.Condition.ToString());
+            using (IndentedBracketScope(node.Statement))
+                Visit(node.Statement);
+
+            if (node.Else != null)
+            {
+                Emit("else");
+                using (IndentedBracketScope(node.Else.Statement))
+                    Visit(node.Else.Statement);
+            }
+        }
+
+        public override void VisitWhileStatement(WhileStatementSyntax node)
+        {
+            Emit("while ({0})", node.Condition.ToString());
+            using (IndentedBracketScope(node.Statement))
+                Visit(node.Statement);
+        }
+
         internal class BlockScope : IDisposable
         {
             private readonly Transpiler _visitor;
+            private readonly bool _requiresBraces;
 
-            internal BlockScope(Transpiler visitor)
+            internal BlockScope(Transpiler visitor) : this(visitor, true)
             {
+            }
+
+            internal BlockScope(Transpiler visitor, bool requiresBraces)
+            {
+                _requiresBraces = requiresBraces;
                 _visitor = visitor;
-                _visitor.Emit("{");
+                if (_requiresBraces)
+                    _visitor.Emit("{");
                 _visitor.AddIndent();
             }
 
             public void Dispose()
             {
                 _visitor.RemoveIndent();
-                _visitor.Emit("}");
+                if (_requiresBraces)
+                    _visitor.Emit("}");
             }
         }
     }

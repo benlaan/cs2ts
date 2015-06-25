@@ -2,7 +2,7 @@
 
 using NUnit.Framework;
 
-namespace cs2ts
+namespace cs2ts.Tests
 {
     [TestFixture]
     public class ConvertNamespaceTest : BaseTest
@@ -18,17 +18,17 @@ namespace cs2ts
                     {
                     }
                 }
-            @";
+            ";
 
-            var expected = new[]
-            {
-                "module OuterNamespace.SubNamespace",
-                "{",
-                "    module InnerNamespace",
-                "    {",
-                "    }",
-                "}"
-            };
+            var expected = @"
+
+                module OuterNamespace.SubNamespace
+                {
+                    module InnerNamespace
+                    {
+                    }
+                }
+            ";
 
             Compare(input, expected);
         }

@@ -28,23 +28,23 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        try",
-                "        {",
-                "        }",
-                "        catch",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        try
+                        {
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -66,23 +66,23 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        try",
-                "        {",
-                "        }",
-                "        catch (ex)",
-                "        {",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        try
+                        {
+                        }
+                        catch (ex)
+                        {
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
@@ -108,27 +108,27 @@ namespace cs2ts.Tests
                         }
                     }
                 }
-            @";
+             ";
 
-            var expected = new[]
-            {
-                "public class AClass",
-                "{",
-                "    public AMethod(): void",
-                "    {",
-                "        try",
-                "        {",
-                "            Console.WriteLine(\"Do Work!\");",
-                "            Console.WriteLine(\"Do More Work!\");",
-                "        }",
-                "        catch (ex)",
-                "        {",
-                "            Console.WriteLine(\"Err!\");",
-                "            Console.WriteLine(\"Errors!\");",
-                "        }",
-                "    }",
-                "}",
-            };
+            var expected = @"
+
+                public class AClass
+                {
+                    public AMethod(): void
+                    {
+                        try
+                        {
+                            Console.WriteLine(""Do Work!"");
+                            Console.WriteLine(""Do More Work!"");
+                        }
+                        catch (ex)
+                        {
+                            Console.WriteLine(""Err!"");
+                            Console.WriteLine(""Errors!"");
+                        }
+                    }
+                }
+             ";
 
             Compare(input, expected);
         }
